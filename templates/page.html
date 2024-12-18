@@ -1,206 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>True Stretch</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #182967;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #182967;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
 
-        header {
-            background-color: #182967;
-            text-align: center;
-            padding: 4em 1em;
-            position: relative;
-            overflow: hidden;
-        }
+      header {
+        background-color: #182967;
+        text-align: center;
+        padding: 4em 1em;
+        position: relative;
+        overflow: hidden;
+      }
 
+      header h1 {
+        font-size: 11vw;
+        font-weight: 900;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: -5px;
+        margin: 0;
+        line-height: 0.9;
+      }
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin: 20px;
+      }
+
+      .left,
+      .right {
+        flex: 1;
+        min-width: 300px;
+        padding: 30px;
+        margin: 10px;
+        background: rgb(176, 176, 176);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: #000000;
+        font-size: 1.8em;
+        margin-bottom: 15px;
+      }
+
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: inline-block;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+        box-sizing: border-box;
+        transition: all 0.3s ease-in-out;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      textarea {
+        min-height: 180px;
+        resize: none;
+      }
+
+      .button-container {
+        text-align: center;
+      }
+
+      button {
+        padding: 12px 25px;
+        font-size: 1.2em;
+        font-family: Arial, sans-serif;
+        color: black;
+        background-color: #182967;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      @media (max-width: 768px) {
         header h1 {
-            font-size: 11vw;
-            font-weight: 900;
-            color: #000;
-            text-transform: uppercase;
-            letter-spacing: -5px;
-            margin: 0;
-            line-height: 0.9;
+          font-size: 18vw;
         }
-
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin: 20px;
-        }
-
-        .left, .right {
-            flex: 1;
-            min-width: 300px;
-            padding: 30px;
-            margin: 10px;
-            background: rgb(176, 176, 176);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #000000;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: inline-block;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
-            transition: all 0.3s ease-in-out;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            border-color: #007BFF;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-
-        textarea {
-            min-height: 180px;
-            resize: none;
-        }
-
-        .button-container {
-            text-align: center;
-        }
-
-        button {
-            padding: 12px 25px;
-            font-size: 1.2em;
-            font-family: Arial, sans-serif;
-            color: black;
-            background-color: #182967;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 18vw;
-            }
-        }
+      }
     </style>
     <script>
-        function autoResizeTextarea(id) {
-            const textarea = document.getElementById(id);
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
+      function autoResizeTextarea(id) {
+        const textarea = document.getElementById(id);
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      }
+
+      function computeBestResolutions() {
+        const height = document.getElementById("height").value;
+        const breadth = document.getElementById("breadth").value;
+        const resolutions = document.getElementById("resolutions").value;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/compute", true);
+        xhr.setRequestHeader(
+          "Content-Type",
+          "application/x-www-form-urlencoded"
+        );
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            const bestResolutions = document.getElementById("best_resolutions");
+            bestResolutions.value = xhr.responseText;
+            autoResizeTextarea("best_resolutions");
+          }
+        };
+
+        const data = `height=${height}&breadth=${breadth}&resolutions=${encodeURIComponent(
+          resolutions
+        )}`;
+        xhr.send(data);
+      }
+
+      function validateHeightBreadth(event) {
+        const value = event.target.value;
+        const regex = /^\d+$/;
+
+        if (!regex.test(value)) {
+          event.target.setCustomValidity("Please enter a valid integer.");
+        } else {
+          event.target.setCustomValidity("");
         }
+      }
 
-        function computeBestResolutions() {
-            const height = document.getElementById("height").value;
-            const breadth = document.getElementById("breadth").value;
-            const resolutions = document.getElementById("resolutions").value;
+      function validateResolutions(event) {
+        const value = event.target.value;
+        const lines = value.split("\n");
+        const regex = /^\d+x\d+$/;
 
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/compute", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const bestResolutions = document.getElementById("best_resolutions");
-                    bestResolutions.value = xhr.responseText;
-                    autoResizeTextarea("best_resolutions");
-                }
-            };
-
-            const data = `height=${height}&breadth=${breadth}&resolutions=${encodeURIComponent(resolutions)}`;
-            xhr.send(data);
+        for (let line of lines) {
+          if (line.trim() !== "" && !regex.test(line.trim())) {
+            event.target.setCustomValidity(
+              "Please enter resolutions in the format 'width x height' (e.g., 1920x1080), each on a new line."
+            );
+            return;
+          }
         }
+        event.target.setCustomValidity("");
+      }
 
-        function validateHeightBreadth(event) {
-            const value = event.target.value;
-            const regex = /^\d+$/;
-
-            if (!regex.test(value)) {
-                event.target.setCustomValidity("Please enter a valid integer.");
-            } else {
-                event.target.setCustomValidity("");
-            }
-        }
-
-        function validateResolutions(event) {
-            const value = event.target.value;
-            const lines = value.split("\n");
-            const regex = /^\d+x\d+$/;
-
-            for (let line of lines) {
-                if (line.trim() !== "" && !regex.test(line.trim())) {
-                    event.target.setCustomValidity("Please enter resolutions in the format 'width x height' (e.g., 1920x1080), each on a new line.");
-                    return;
-                }
-            }
-            event.target.setCustomValidity("");
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById("height").addEventListener("input", validateHeightBreadth);
-            document.getElementById("breadth").addEventListener("input", validateHeightBreadth);
-            document.getElementById("resolutions").addEventListener("input", validateResolutions);
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("height")
+          .addEventListener("input", validateHeightBreadth);
+        document
+          .getElementById("breadth")
+          .addEventListener("input", validateHeightBreadth);
+        document
+          .getElementById("resolutions")
+          .addEventListener("input", validateResolutions);
+      });
     </script>
-</head>
-<body>
-    
-<header>
-    <div class="hero-text">
+  </head>
+  <body>
+    <header>
+      <div class="hero-text">
         <h1>TRUE STRETCH</h1>
-    </div>
-</header>
+      </div>
+    </header>
 
-<div class="container">
-    <div class="left">
+    <div class="container">
+      <div class="left">
         <h2>Your Screen's Native Pixel Resolution:</h2>
         <form onsubmit="event.preventDefault(); computeBestResolutions();">
-            <label for="breadth">Breadth:</label>
-            <input type="text" id="breadth" name="breadth" required>
+          <label for="breadth">Breadth:</label>
+          <input type="text" id="breadth" name="breadth" required />
 
-            <label for="height">Height:</label>
-            <input type="text" id="height" name="height" required>
+          <label for="height">Height:</label>
+          <input type="text" id="height" name="height" required />
 
-            <label for="resolutions">Enter Resolutions (e.g., 1920x1080, each on a new line):</label>
-            <textarea id="resolutions" name="resolutions" required></textarea>
+          <label for="resolutions"
+            >Enter Resolutions (e.g., 1920x1080, each on a new line):</label
+          >
+          <textarea id="resolutions" name="resolutions" required></textarea>
 
-            <div class="button-container">
-                <button type="submit">Compute</button>
-            </div>
+          <div class="button-container">
+            <button type="submit">Compute</button>
+          </div>
         </form>
-    </div>
+      </div>
 
-    <div class="right">
+      <div class="right">
         <h2>Best Resolutions for Stretch in Order:</h2>
         <textarea id="best_resolutions" readonly></textarea>
+      </div>
     </div>
-</div>
-
-</body>
+  </body>
 </html>
