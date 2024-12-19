@@ -31,22 +31,43 @@
         line-height: 0.9;
       }
 
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 8vw;
+          letter-spacing: 1px;
+        }
+      }
+
       .container {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
         margin: 20px;
+        gap: 10px;
       }
 
       .left,
       .right {
         flex: 1;
-        min-width: 300px;
-        padding: 30px;
-        margin: 10px;
+        padding: 20px;
         background: rgb(176, 176, 176);
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+      }
+
+      @media (min-width: 769px) {
+        .left,
+        .right {
+          max-width: 50%;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .left,
+        .right {
+          width: 100%;
+          margin-bottom: 10px;
+        }
       }
 
       h2 {
@@ -74,13 +95,6 @@
         transition: all 0.3s ease-in-out;
       }
 
-      input[type="text"]:focus,
-      textarea:focus {
-        border-color: #007bff;
-        outline: none;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-      }
-
       textarea {
         min-height: 180px;
         resize: none;
@@ -105,85 +119,7 @@
       button:hover {
         background-color: #0056b3;
       }
-
-      @media (max-width: 768px) {
-        header h1 {
-          font-size: 18vw;
-        }
-      }
     </style>
-    <script>
-      function autoResizeTextarea(id) {
-        const textarea = document.getElementById(id);
-        textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
-      }
-
-      function computeBestResolutions() {
-        const height = document.getElementById("height").value;
-        const breadth = document.getElementById("breadth").value;
-        const resolutions = document.getElementById("resolutions").value;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/compute", true);
-        xhr.setRequestHeader(
-          "Content-Type",
-          "application/x-www-form-urlencoded"
-        );
-
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            const bestResolutions = document.getElementById("best_resolutions");
-            bestResolutions.value = xhr.responseText;
-            autoResizeTextarea("best_resolutions");
-          }
-        };
-
-        const data = `height=${height}&breadth=${breadth}&resolutions=${encodeURIComponent(
-          resolutions
-        )}`;
-        xhr.send(data);
-      }
-
-      function validateHeightBreadth(event) {
-        const value = event.target.value;
-        const regex = /^\d+$/;
-
-        if (!regex.test(value)) {
-          event.target.setCustomValidity("Please enter a valid integer.");
-        } else {
-          event.target.setCustomValidity("");
-        }
-      }
-
-      function validateResolutions(event) {
-        const value = event.target.value;
-        const lines = value.split("\n");
-        const regex = /^\d+x\d+$/;
-
-        for (let line of lines) {
-          if (line.trim() !== "" && !regex.test(line.trim())) {
-            event.target.setCustomValidity(
-              "Please enter resolutions in the format 'width x height' (e.g., 1920x1080), each on a new line."
-            );
-            return;
-          }
-        }
-        event.target.setCustomValidity("");
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-        document
-          .getElementById("height")
-          .addEventListener("input", validateHeightBreadth);
-        document
-          .getElementById("breadth")
-          .addEventListener("input", validateHeightBreadth);
-        document
-          .getElementById("resolutions")
-          .addEventListener("input", validateResolutions);
-      });
-    </script>
   </head>
   <body>
     <header>
@@ -195,7 +131,7 @@
     <div class="container">
       <div class="left">
         <h2>Your Screen's Native Pixel Resolution:</h2>
-        <form onsubmit="event.preventDefault(); computeBestResolutions();">
+        <form id="compute-form">
           <label for="breadth">Breadth:</label>
           <input type="text" id="breadth" name="breadth" required />
 
@@ -218,5 +154,26 @@
         <textarea id="best_resolutions" readonly></textarea>
       </div>
     </div>
+
+    <script>
+      document.getElementById("compute-form").addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent the default form submission behavior
+
+        const formData = new FormData(this);
+
+        fetch("/compute", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("best_resolutions").value = data; // Update the output box
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while processing your request.");
+          });
+      });
+    </script>
   </body>
 </html>
